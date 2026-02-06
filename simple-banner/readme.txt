@@ -3,8 +3,8 @@ Contributors: rpetersen29
 Donate link: https://www.paypal.me/rpetersenDev
 Tags: banner, bar, announcement, notification, notice
 Requires at least: 3.0.1
-Tested up to: 6.8.2
-Stable tag: 3.1.1
+Tested up to: 6.9.0
+Stable tag: 3.2.1
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -98,6 +98,18 @@ Try setting the "Prepend element" setting to <code>header</code>. If that doesn'
 4. This is the fifth screen shot.
 
 == Changelog ==
+
+= 3.2.1 =
+* Bug fix for tinymce
+
+= 3.2.0 =
+* Added rich text editor (TinyMCE)
+
+= 3.1.3 =
+* Test against wp 6.9.0
+
+= 3.1.2 =
+* Bug fixes
 
 = 3.1.1 =
 * Bug fixes
@@ -380,6 +392,18 @@ Try setting the "Prepend element" setting to <code>header</code>. If that doesn'
 * First Version.
 
 == Upgrade Notice ==
+
+= 3.2.1 =
+* Bug fix for tinymce
+
+= 3.2.0 =
+* Added rich text editor (TinyMCE)
+
+= 3.1.3 =
+* Test against wp 6.9.0
+
+= 3.1.2 =
+* Bug fixes
 
 = 3.1.1 =
 * Bug fixes

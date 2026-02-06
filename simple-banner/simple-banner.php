@@ -3,13 +3,13 @@
  * Plugin Name: Simple Banner
  * Plugin URI: https://github.com/rpetersen29/simple-banner
  * Description: Display a simple banner at the top or bottom of your website. Now with multi-banner support
- * Version: 3.1.1
+ * Version: 3.2.1
  * Author: Ryan Petersen
  * Author URI: http://rpetersen29.github.io/
  * License: GPLv3
  *
  * @package Simple Banner
- * @version 3.1.1
+ * @version 3.2.1
  * @author Ryan Petersen <rpetersen.dev@gmail.com>
  */
 
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define ('SB_VERSION', '3.1.1');
+define ('SB_VERSION', '3.2.1');
 define('SB_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SB_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -591,6 +591,21 @@ function is_license_verified(){
 	return $is_pro_currently_enabled;
 }
 
+function my_custom_tinymce_config( $settings ) {
+    // This JS runs inside the TinyMCE 'setup' configuration
+    $settings['setup'] = 'function(editor) {
+        editor.on("change keyup input undo redo", function(e) {
+            // 1. Sync Visual content to the hidden textarea
+            editor.save();
+						// 2. Trigger an onInput event for the banner
+						document.getElementById(editor.id).dispatchEvent(new Event("input", { bubbles: true }))
+
+        });
+    }';
+    return $settings;
+}
+add_filter( 'tiny_mce_before_init', 'my_custom_tinymce_config' );
+
 function simple_banner_settings_page() {
 	?>
 	<?php
@@ -599,10 +614,10 @@ function simple_banner_settings_page() {
 	?>
 
 	<!-- Simple Banner Default Stylesheet -->
-	<link rel="stylesheet" href="<?php echo SB_PLUGIN_URL .'simple-banner.css' ?>"></script>
+	<link rel="stylesheet" href="<?php echo SB_PLUGIN_URL .'simple-banner.css' ?>" />
 	<!-- Admin Styles -->
-	<link rel="stylesheet" href="<?php echo SB_PLUGIN_URL .'admin/styles/main.css' ?>"></script>
-	<link rel="stylesheet" href="<?php echo SB_PLUGIN_URL .'admin/styles/preview-banner.css' ?>"></script>
+	<link rel="stylesheet" href="<?php echo SB_PLUGIN_URL .'admin/styles/main.css' ?>" />
+	<link rel="stylesheet" href="<?php echo SB_PLUGIN_URL .'admin/styles/preview-banner.css' ?>" />
 	<script type="text/javascript" src="<?php echo SB_PLUGIN_URL .'vendors/purify.min.js' ?>"></script>
 
 	<div class="wrap simple-banner-admin">
@@ -713,9 +728,10 @@ function simple_banner_settings_page() {
 			document.getElementById(`preview_banner_text${banner_id}`).innerHTML = document.getElementById(`simple_banner_text${banner_id}`).value != "" ? 
 							'<span>'+stripBannerText(document.getElementById(`simple_banner_text${banner_id}`).value)+'</span>' : 
 							'<span>This is what your banner will look like with a <a href="/">link</a>.</span>';
-			document.getElementById(`simple_banner_text${banner_id}`).onchange=function(e){
+			const onBannerTextChangeHandler = function(e){
 				document.getElementById(`preview_banner_text${banner_id}`).innerHTML = e.target.value != "" ? '<span>'+stripBannerText(e.target.value)+'</span>' : '<span>This is what your banner will look like with a <a href="/">link</a>.</span>';
 			};
+			document.getElementById(`simple_banner_text${banner_id}`).oninput=onBannerTextChangeHandler;
 
 			// Close Button
 			const closeButton = `<button id="simple-banner-close-button${banner_id}" class="simple-banner-button${banner_id}">✕</button>`;
