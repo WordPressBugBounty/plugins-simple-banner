@@ -3,13 +3,13 @@
  * Plugin Name: Simple Banner
  * Plugin URI: https://github.com/rpetersen29/simple-banner
  * Description: Display a simple banner at the top or bottom of your website. Now with multi-banner support
- * Version: 3.2.1
+ * Version: 3.2.2
  * Author: Ryan Petersen
  * Author URI: http://rpetersen29.github.io/
  * License: GPLv3
  *
  * @package Simple Banner
- * @version 3.2.1
+ * @version 3.2.2
  * @author Ryan Petersen <rpetersen.dev@gmail.com>
  */
 
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define ('SB_VERSION', '3.2.1');
+define ('SB_VERSION', '3.2.2');
 define('SB_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SB_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -518,9 +518,7 @@ function is_license_verified(){
 		return false;
 	}
 
-	$is_pro_currently_enabled = esc_attr( get_option('pro_version_enabled') );
-
-    $url = 'https://api.gumroad.com/v2/licenses/verify';
+	$url = 'https://api.gumroad.com/v2/licenses/verify';
 
 	$ch = curl_init($url);
 	curl_setopt($ch, CURLOPT_HEADER, false);
@@ -541,6 +539,7 @@ function is_license_verified(){
 	curl_close($ch);
 
 	// TODO: Figure out what to do with these
+	// COMMENT: May not be necessary now with try/catch, keeping to understand previous train of thought
 	// also get the error and response code
 	// $errors = curl_error($ch);
 	// $json_errors = json_decode($errors);
@@ -548,11 +547,24 @@ function is_license_verified(){
 	// e.g. {"success":false,"message":"That license does not exist for the provided product."}
 	// $response = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
-	$json = json_decode($result);
-	$success = $json->{'success'};
+	// Safely decode the response. If the request failed, the response is not
+	// valid JSON, or the expected fields are missing, treat it as an
+	// unverified license and return false. This prevents cases where a
+	// blocked or unreachable verification endpoint would otherwise leave
+	// pro enabled indefinitely.
+	try {
+		$json = json_decode($result);
+
+		if (!is_object($json) || !isset($json->success)) {
+			return false;
+		}
+
+		$success = $json->{'success'};
+	} catch (Exception $e) {
+		return false;
+	}
 
 	// check if license is active
-	// if error or unknown response return current value
 	if ($success === true) {
 		// now check if cancelled, failed, or ended
 		$subscription_cancelled_at = $json->{'purchase'}->{'subscription_cancelled_at'};
@@ -585,10 +597,9 @@ function is_license_verified(){
 			}
 		}
 		return true;
-	} else if ($success === false) {
+	} else {
 		return false;
 	}
-	return $is_pro_currently_enabled;
 }
 
 function my_custom_tinymce_config( $settings ) {
