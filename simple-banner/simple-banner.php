@@ -3,13 +3,13 @@
  * Plugin Name: Simple Banner
  * Plugin URI: https://github.com/rpetersen29/simple-banner
  * Description: Display a simple banner at the top or bottom of your website. Now with multi-banner support
- * Version: 3.2.2
+ * Version: 3.3.0
  * Author: Ryan Petersen
  * Author URI: http://rpetersen29.github.io/
  * License: GPLv3
  *
  * @package Simple Banner
- * @version 3.2.2
+ * @version 3.3.0
  * @author Ryan Petersen <rpetersen.dev@gmail.com>
  */
 
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define ('SB_VERSION', '3.2.2');
+define ('SB_VERSION', '3.3.0');
 define('SB_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SB_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -602,8 +602,13 @@ function is_license_verified(){
 	}
 }
 
-function my_custom_tinymce_config( $settings ) {
+function my_custom_tinymce_config( $settings, $editor_id ) {
+		// Check if the editor ID starts with 'simple_banner_text'
+    if ( 0 !== strpos( $editor_id, 'simple_banner_text' ) ) {
+        return $settings;
+    }
     // This JS runs inside the TinyMCE 'setup' configuration
+		// This function ensures preview banner can see live changes in `Visual` mode
     $settings['setup'] = 'function(editor) {
         editor.on("change keyup input undo redo", function(e) {
             // 1. Sync Visual content to the hidden textarea
@@ -615,7 +620,7 @@ function my_custom_tinymce_config( $settings ) {
     }';
     return $settings;
 }
-add_filter( 'tiny_mce_before_init', 'my_custom_tinymce_config' );
+add_filter( 'tiny_mce_before_init', 'my_custom_tinymce_config', 10, 2 );
 
 function simple_banner_settings_page() {
 	?>
