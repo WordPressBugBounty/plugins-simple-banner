@@ -1,5 +1,9 @@
 <wpml-config>
     <admin-texts>
         <key name="simple_banner_text"/>
+        <key name="simple_banner_text_2"/>
+        <key name="simple_banner_text_3"/>
+        <key name="simple_banner_text_4"/>
+        <key name="simple_banner_text_5"/>
     </admin-texts>
 </wpml-config>
