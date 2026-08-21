@@ -92,7 +92,7 @@ jQuery(document).ready(function ($) {
             if (document.getElementById(strings.simpleBannerHeaderPadding)) document.getElementById(strings.simpleBannerHeaderPadding).remove();
             if (document.getElementById(strings.simpleBanner)) document.getElementById(strings.simpleBanner).remove();
         }
-        
+
         if (isSimpleBannerVisible) {
             const sbCookie = strings.simpleBannerClosedCookie;
 
@@ -114,7 +114,7 @@ jQuery(document).ready(function ($) {
                 }
             }
         }
-        
+
     })
 
     // Cookie Getter/Setter

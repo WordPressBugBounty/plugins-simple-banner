@@ -10,7 +10,11 @@ $is_pro_enabled = get_option('pro_version_enabled');
 
 <div id="pro_section<?php echo $banner_id ?>" class="sb-settings-section pro simple-banner-settings-section" style="<?php echo $section_style ?>">
     <div class="sb-section-header">
-        <h3>Banner #<?php echo $i ?> - Pro Features</h3>
+        <?php
+            $nickname = get_option('simple_banner_nickname' . $banner_id);
+            $pro_heading_label = 'Banner #' . $i . ($nickname ? ' — ' . $nickname : '');
+        ?>
+        <h3><?php echo esc_html($pro_heading_label) ?> - Pro Features</h3>
         <?php if (!$is_pro_enabled): ?>
             <a class="button-primary" href="https://rpetersendev.gumroad.com/l/simple-banner" target="_blank">
                 Purchase Pro License

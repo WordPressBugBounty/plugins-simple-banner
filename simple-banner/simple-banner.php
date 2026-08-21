@@ -3,13 +3,13 @@
  * Plugin Name: Simple Banner
  * Plugin URI: https://github.com/rpetersen29/simple-banner
  * Description: Display a simple banner at the top or bottom of your website. Now with multi-banner support
- * Version: 3.3.1
+ * Version: 3.3.2
  * Author: Ryan Petersen
  * Author URI: http://rpetersen29.github.io/
  * License: GPLv3
  *
  * @package Simple Banner
- * @version 3.3.1
+ * @version 3.3.2
  * @author Ryan Petersen <rpetersen.dev@gmail.com>
  */
 
@@ -18,7 +18,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define ('SB_VERSION', '3.3.1');
+define ('SB_VERSION', '3.3.2');
 define('SB_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('SB_PLUGIN_URL', plugin_dir_url(__FILE__));
 
@@ -110,7 +110,6 @@ function simple_banner() {
 			'wp_body_open_enabled' => $i === 1 ? get_option('wp_body_open_enabled' . $banner_id) : '',
 			'wp_body_open' => function_exists('wp_body_open'),
 			'simple_banner_z_index' => get_option('simple_banner_z_index' . $banner_id),
-			'simple_banner_text' => get_option('simple_banner_text' . $banner_id),
 			'disabled_on_current_page' => $disabled_on_current_page,
 			'disabled_pages_array' => get_disabled_pages_array($banner_id),
 			'is_current_page_a_post' => get_is_current_page_a_post(),
@@ -163,10 +162,10 @@ function simple_banner_body_open() {
 	$closed_button = $close_button_enabled ? '<button id="simple-banner-close-button" class="simple-banner-button">&#x2715;</button>' : '';
 
 	if (!$disabled_on_current_page && !$closed_cookie) {
-		echo '<div id="simple-banner" class="simple-banner"><div class="simple-banner-text"><span>' 
-		. get_option('simple_banner_text' . $banner_id) 
-		. '</span></div>' 
-		. $closed_button 
+		echo '<div id="simple-banner" class="simple-banner"><div class="simple-banner-text"><span>'
+		. get_option('simple_banner_text' . $banner_id)
+		. '</span></div>'
+		. $closed_button
 		. '</div>';
 	}
 }
@@ -387,6 +386,11 @@ function simple_banner_settings() {
 		    	'sanitize_callback' => 'wp_filter_nohtml_kses'
 			)
 	    );
+		register_setting( 'simple-banner-settings-group', 'simple_banner_nickname' . $banner_id,
+			array(
+		    	'sanitize_callback' => 'sanitize_text_field'
+			)
+	    );
 		register_setting( 'simple-banner-settings-group', 'simple_banner_prepend_element' . $banner_id,
 			array(
 		    	'sanitize_callback' => 'wp_filter_nohtml_kses'
@@ -531,21 +535,12 @@ function is_license_verified(){
 	);
 
 	curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-	
+
 	// execute request and get response
 	$result = curl_exec($ch);
 	// Keeping for backwards compatibility
 	// This function has no effect. Prior to PHP 8.0.0, this function was used to close the resource.
 	curl_close($ch);
-
-	// TODO: Figure out what to do with these
-	// COMMENT: May not be necessary now with try/catch, keeping to understand previous train of thought
-	// also get the error and response code
-	// $errors = curl_error($ch);
-	// $json_errors = json_decode($errors);
-	// gumroad returns a 404 on invalid license code
-	// e.g. {"success":false,"message":"That license does not exist for the provided product."}
-	// $response = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
 	// Safely decode the response. If the request failed, the response is not
 	// valid JSON, or the expected fields are missing, treat it as an
@@ -672,7 +667,9 @@ function simple_banner_settings_page() {
 					<select id="banner_selector" <?php echo get_num_banners() === 1 ? 'disabled' : '' ?>>
 						<?php for ($i = 1; $i <= get_num_banners(); $i++) {
 							$value = $i === 1 ? '' : '_' . $i;
-							echo '<option value="' . $value . '">Banner #' . $i . '</option>';
+							$nickname = get_option('simple_banner_nickname' . $value);
+							$label = 'Banner #' . $i . ($nickname ? ' — ' . $nickname : '');
+							echo '<option id="banner_selector_option' . $value . '" value="' . $value . '">' . esc_html($label) . '</option>';
 						} ?>
 					</select>
 					
@@ -748,6 +745,18 @@ function simple_banner_settings_page() {
 				document.getElementById(`preview_banner_text${banner_id}`).innerHTML = e.target.value != "" ? '<span>'+stripBannerText(e.target.value)+'</span>' : '<span>This is what your banner will look like with a <a href="/">link</a>.</span>';
 			};
 			document.getElementById(`simple_banner_text${banner_id}`).oninput=onBannerTextChangeHandler;
+
+			// Banner Nickname (admin-only label, updates the selector option and section heading live)
+			const nicknameInput = document.getElementById(`simple_banner_nickname${banner_id}`);
+			const selectorOption = document.getElementById(`banner_selector_option${banner_id}`);
+			const sectionHeading = document.getElementById(`banner_heading${banner_id}`);
+			if (nicknameInput) {
+				nicknameInput.oninput = function(e){
+					const label = `Banner #${i}` + (e.target.value ? ` — ${e.target.value}` : '');
+					if (selectorOption) selectorOption.textContent = label;
+					if (sectionHeading) sectionHeading.textContent = `${label} Settings`;
+				};
+			}
 
 			// Close Button
 			const closeButton = `<button id="simple-banner-close-button${banner_id}" class="simple-banner-button${banner_id}">✕</button>`;

@@ -3,8 +3,8 @@ Contributors: rpetersen29
 Donate link: https://www.paypal.me/rpetersenDev
 Tags: banner, bar, announcement, notification, notice
 Requires at least: 3.0.1
-Tested up to: 7.0.2
-Stable tag: 3.3.1
+Tested up to: 7.1.0
+Stable tag: 3.3.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -98,6 +98,9 @@ Try setting the "Prepend element" setting to <code>header</code>. If that doesn'
 4. This is the fifth screen shot.
 
 == Changelog ==
+
+= 3.3.2 =
+* Add banner nicknames
 
 = 3.3.1 =
 * Add WPML support for all banners
@@ -401,6 +404,9 @@ Try setting the "Prepend element" setting to <code>header</code>. If that doesn'
 * First Version.
 
 == Upgrade Notice ==
+
+= 3.3.2 =
+* Add banner nicknames
 
 = 3.3.1 =
 * Add WPML support for all banners

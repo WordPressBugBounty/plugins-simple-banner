@@ -9,11 +9,30 @@ $section_style = $banner_id === '' ? '' : 'display:none;';
 
 <div id="free_section<?php echo $banner_id ?>" class="sb-settings-section simple-banner-settings-section" style="<?php echo $section_style ?>">
     <div class="sb-section-header">
-        <h3>Banner #<?php echo $i ?> Settings</h3>
+        <?php
+            $nickname = get_option('simple_banner_nickname' . $banner_id);
+            $heading_label = 'Banner #' . $i . ($nickname ? ' — ' . $nickname : '');
+        ?>
+        <h3 id="banner_heading<?php echo $banner_id ?>"><?php echo esc_html($heading_label) ?> Settings</h3>
     </div>
-    
+
     <div class="sb-section-content">
         <table class="form-table">
+            <!-- Banner Nickname -->
+            <tr>
+                <th scope="row">
+                    <label for="simple_banner_nickname<?php echo $banner_id ?>">Banner Nickname</label>
+                    <div class="sb-field-description">For your reference only, not shown on the site</div>
+                </th>
+                <td>
+                    <input type="text" id="simple_banner_nickname<?php echo $banner_id ?>"
+                           name="simple_banner_nickname<?php echo $banner_id ?>"
+                           placeholder="e.g. Black Friday Sale"
+                           maxlength="60"
+                           value="<?php echo esc_attr($nickname); ?>" />
+                </td>
+            </tr>
+
             <!-- Banner Text -->
             <tr>
                 <th scope="row">
